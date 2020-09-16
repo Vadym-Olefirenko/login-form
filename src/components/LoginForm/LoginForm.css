@@ -1,0 +1,57 @@
+.form__container {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.form {
+    text-align: center;
+    border: 2px solid #000;
+    padding: 15px;
+    border-radius: 10px;
+    min-width: 400px;
+}
+
+h2 {
+    font-size: 35px;
+    line-height: 112%;
+    font-weight: bold;
+    color: rebeccapurple;
+    margin-bottom: 30px;
+    font-style: italic;
+}
+
+.buttons__box {
+    display:  flex;
+    justify-content: space-around;
+}
+
+label {
+    font-size: 16px;
+    line-height: 18px;
+    font-style: italic;
+}
+
+.inputBox { 
+    padding: 15px;
+}
+
+input {
+    height: 45px;
+    width: 210px;
+    margin-top: 15px;
+    font-size: 26px;
+    line-height: 28px;
+}
+
+.btn {
+    height: 35px;
+    width: 120px;
+    background-color:  rebeccapurple;
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 16px;
+    line-height: 18px;
+}
