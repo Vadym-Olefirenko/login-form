@@ -1,16 +1,24 @@
-import React from 'react';
-import { BrowserRouter, Switch, Route, NavLink } from 'react-router-dom';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Switch, Route, NavLink } from 'react-router-dom';
 
 import Form from '../LoginForm/LoginForm';
 import Dashboard from '../Dashboard/Dashboard'
 const App = () => {
+    const [token, setToken] = useState();
+    const settingOfToken = (value) => {
+        setToken(value);
+    }
     return (
-       <BrowserRouter>
+       <Router>
             <Switch>
-                <Route path="/" exact component={Form}/>
-                <Route path="/dashboard" exact component={Dashboard}/>
+                <Route path="/" exact render={
+                    () => (<Form tokenValue = {settingOfToken}/>)
+                }/>
+                <Route path="/dashboard" exact render={
+                    () => (<Dashboard token={token}/>)
+                }/>
             </Switch>
-       </BrowserRouter>
+       </Router>
     )
 }
 

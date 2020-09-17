@@ -1,0 +1,19 @@
+.dash__page {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(230, 245, 244);
+}
+
+.mess {
+    font-size: 46px;
+    line-height: 112%;
+    font-weight: bold;
+}
+
+.info {
+    font-style: italic;
+    font-size: 36px;
+    line-height: 112%;
+}

@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import { withRouter } from "react-router";
 import axios from 'axios';
 import './LoginForm.css'
 
@@ -6,92 +7,92 @@ const Form = (props) => {
     const [login, setLogin] = useState('');
     const [password, setPassword] = useState('');
     const [status, setStatus] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [token, setToken] = useState();
     
     const handleLogin = () => {
-        axios.post(`http://142.93.134.108:1111/login?email=${login}&password=${password}`, {
-            email: login,
-            password: password
-          })
-          .then(function (response) {
-            console.log(response);
+        if (login.length > 0 && password.length > 0) {
+            axios.post(`http://142.93.134.108:1111/login?email=${login}&password=${password}`, {
+                email: login,
+                password: password
+            })
+            .then((response) => {
+                let {status_code, body} = response.data;
 
-            let {status_code, body} = response.data;
+                let logToken = body; 
 
-            let tok = body.access_token; 
-            setToken(tok);
-            console.log(tok)
-
-            if(status_code === 401) {
-                setStatus('User is not defined!');
-            }
-            props.history.push('/dashboard');
-
-            axios.get(`http://142.93.134.108:1111/me`, {
-                headers: {
-                    Authorization:'Bearer ' + tok
+                if(status_code === 401) {
+                    setStatus('User is not defined!');
+                } else {
+                    // localStorage.setItem('accsess_token', response.data.body.access_token);
+                    props.tokenValue(logToken);
+                    props.history.push('/dashboard');
                 }
-            })
-            .then((res) => {
-                console.log(res);
-            })
           })
-          .catch(function (error) {
+          .catch((error) => {
             console.log(error);
           });
+        } else {
+            setStatus('Fill in all fields!');
+        }
+        
     }
 
 
     const handleRegister = () => {
-        axios.post('http://142.93.134.108:1111/sign_up', {
-            email: login,
-            password: password
-          })
-          .then(function (response) {
-            console.log(response);
-            setStatus('User was registred!');
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
+        if (login.length > 0 && password.length > 0) {
+            axios.post('http://142.93.134.108:1111/sign_up', {
+                email: login,
+                password: password
+            })
+            .then((response) => {
+                console.log(response);
+                setStatus('User was registred!');
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+        } else {
+            setStatus('Fill in all fields!');
+        }
+        
     }
 
     return (
         <div className="form__container">
-           <div className="form">
-           <h2>Log in or register now!</h2>
-            <div className="inputBox">
-                <label htmlFor="login">Login</label><br/>
-                <input 
-                    type="text" 
-                    id="login" 
-                    onChange={(e) => {
-                        setLogin(e.target.value);
-                    }}
-                />
-            </div>
-            <div className="inputBox">
-                <label htmlFor="password">Password</label><br/>
-                <input 
-                    type="password" 
-                    id="password" 
-                    onChange={(e) => {
-                        setPassword(e.target.value)
-                    }}
-                />
-            </div>
-            {status && <><small style={{ color: 'red' }}>{status}</small><br /></>}<br />
-            <div className="buttons__box">
-            <input type="button" className="btn" value="Login" onClick={handleLogin} disabled={loading} />
-            <input type="button" className="btn" value="Sign Up" onClick={handleRegister} disabled={loading} />
-            </div>
+           <form className="form">
+            <h2>Log in or sign up now!</h2>
+                <div className="inputBox">
+                    <label htmlFor="login">Login</label><br/>
+                    <input 
+                        type="text" 
+                        id="login" 
+                        onChange={(e) => {
+                            setLogin(e.target.value);
+                            // validator();
+                        }}
+                    />
+                </div>
+                <div className="inputBox">
+                    <label htmlFor="password">Password</label><br/>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        onChange={(e) => {
+                            setPassword(e.target.value)
+                            // validator();
+                        }}
+                    />
+                </div>
+                {status && <><small style={{ color: 'red' }}>{status}</small><br /></>}<br />
+                <div className="buttons__box">
+                <input type="button" className="btn" value="Login" onClick={handleLogin}/>
+                <input type="button" className="btn" value="Sign Up" onClick={handleRegister}/>
+                </div>
             
-           </div>
+           </form>
         </div>
     )
 }
 
 
 
-export default Form;
+export default withRouter(Form);
