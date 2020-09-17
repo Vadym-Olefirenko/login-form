@@ -1,63 +1,59 @@
-import React, {useEffect, useState} from 'react';
-import axios from 'axios'; 
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 import './Dashboard.css'
 
 const Dashboard = (props) => {
   const [content, setContent] = useState('')
+  let acc = localStorage.getItem('accsess_token');
+  let refr = localStorage.getItem('refresh_token');
 
   useEffect(() => {
-    console.log('rendered')
-    
-    let x = localStorage.getItem('myData');
-    console.log()
-  
+
     const handleInfo = ((token) => {
       axios.get(`http://142.93.134.108:1111/me`, {
         headers: {
           Authorization: 'Bearer ' + token
         }
       })
-      .then((response) => { 
-          console.log('me', response);
-          let {body} = response.data;
+        .then((response) => {
+          let { body } = response.data;
           let text = body.message;
           setContent(text);
-      })
+        })
     })
-    
+
+    handleInfo(acc);
+
+  }, []);
+
+  useEffect(() => {
 
     const refreshInfo = ((token) => {
-      axios.post(`http://142.93.134.108:1111/refresh`, {some: 'some'}, {
+      axios.post(`http://142.93.134.108:1111/refresh`, { some: 'some' }, {
         headers: {
           Authorization: 'Bearer ' + token,
         }
       })
-      .then((response) => {
-          console.log('fresh', response);
-          // let {body} = response.data;
-          // let text = body.message;
-          // setContent(text);
-      })
+        .then((response) => {
+          localStorage.setItem('accsess_token', response.data.body.access_token);
+          localStorage.setItem('refresh_token', response.data.body.refresh_token);
+        })
     })
 
-    if (props.token) {
-      let {access_token, refresh_token} = props.token;
-      handleInfo(access_token);
+    setInterval(function () {
+      refreshInfo(refr);
+    }, 60000);
 
-      refreshInfo(refresh_token);
-    } else {
-      setContent('Log in on the main page!')
-    }
-  },[]);
- 
+  }, []);
+
   return (
     <div className="dash__page">
-     <div className="mess">Info: <br/>
-      <span className="info">{content}</span>
-     </div>
+      <div className="mess">Info: <br />
+        <span className="info">{content}</span>
+      </div>
     </div>
   );
 }
- 
+
 export default Dashboard;
