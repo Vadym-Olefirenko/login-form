@@ -5,47 +5,65 @@ import './Dashboard.css'
 
 const Dashboard = (props) => {
   const [content, setContent] = useState('')
-  let acc = localStorage.getItem('accsess_token');
-  let refr = localStorage.getItem('refresh_token');
+  
+  axios.interceptors.request.use(
+    config => {
+      const token = localStorage.getItem('accsess_token');
+       if (token) {
+           config.headers['Authorization'] = 'Bearer ' + token;
+       }
+      console.log('1', config);
+      return config;
+
+    },
+    error => {
+      Promise.reject(error)
+    });
+
+
+  axios.interceptors.response.use(
+    (response) => {
+      console.log('res', response)
+      let statusCode = response.data.statusCode;
+      if (statusCode === 401) {
+        console.log('yes')
+        // axios.post(`http://142.93.134.108:1111/refresh`, { some: 'some' }, {
+        //   headers: {
+        //     Authorization: 'Bearer ' + localStorage.getItem('refresh_token'),
+        //   }
+        // })
+        //   .then((res) => {
+        //     console.log('refresh', res)
+        //     // localStorage.setItem('accsess_token', res.data.body.access_token);
+        //   })
+          
+
+      }
+      return response;
+    },
+    (error) => {
+      return Promise.reject(error);
+    }
+  );
 
   useEffect(() => {
 
     const handleInfo = ((token) => {
-      axios.get(`http://142.93.134.108:1111/me`, {
-        headers: {
-          Authorization: 'Bearer ' + token
-        }
-      })
+      axios.get(`http://142.93.134.108:1111/me`)
         .then((response) => {
+          console.log('from me', response)
           let { body } = response.data;
           let text = body.message;
           setContent(text);
+          // console.log('text', text)
         })
     })
 
-    handleInfo(acc);
+    handleInfo(localStorage.getItem('accsess_token'));
 
   }, []);
 
-  useEffect(() => {
 
-    const refreshInfo = ((token) => {
-      axios.post(`http://142.93.134.108:1111/refresh`, { some: 'some' }, {
-        headers: {
-          Authorization: 'Bearer ' + token,
-        }
-      })
-        .then((response) => {
-          localStorage.setItem('accsess_token', response.data.body.access_token);
-          localStorage.setItem('refresh_token', response.data.body.refresh_token);
-        })
-    })
-
-    setInterval(function () {
-      refreshInfo(refr);
-    }, 60000);
-
-  }, []);
 
   return (
     <div className="dash__page">
