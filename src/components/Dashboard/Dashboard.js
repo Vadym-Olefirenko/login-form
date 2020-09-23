@@ -10,20 +10,17 @@ const Dashboard = (props) => {
   let refTocen = localStorage.getItem('refresh_token');
 
 
-    axios.interceptors.request.use(
-      config => {
-        // const token = localStorage.getItem('accsess_token');
-        // if (token) {
-        //   config.headers['Authorization'] = 'Bearer ' + token;
-        // }
-        accessToken = localStorage.getItem('accsess_token');
-        console.log('1', config);
-        return config;
 
-      },
-      error => {
-        Promise.reject(error)
-      });
+    function getAccessToken(){
+      return localStorage.getItem('accsess_token');
+  }
+   
+  // Use interceptor to inject the token to requests
+  axios.interceptors.request.use(request => {
+      request.headers.get['Authorization'] = `Bearer ${getAccessToken()}`;
+      console.log('1', request);
+      return request;
+  });
 
   axios.interceptors.response.use(
    async (response) => {
@@ -67,11 +64,7 @@ const Dashboard = (props) => {
 
   useEffect(() => {
     const handleInfo = ((token) => {
-      axios.get(`http://142.93.134.108:1111/me`, {
-        headers: {
-          Authorization: 'Bearer ' + token
-        }
-      })
+      axios.get(`http://142.93.134.108:1111/me`)
         .then((response) => {
           console.log('from me', response)
           let { body } = response.data;
