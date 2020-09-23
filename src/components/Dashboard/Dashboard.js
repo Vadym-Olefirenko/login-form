@@ -10,22 +10,22 @@ const Dashboard = (props) => {
   let refTocen = localStorage.getItem('refresh_token');
 
 
-  const refreshInfo = ((token) => {
-    axios.post(`http://142.93.134.108:1111/refresh`, { some: 'some' }, {
-      headers: {
-        Authorization: 'Bearer ' + token,
-      }
-    })
-      .then((res) => {
-        console.log('refresh', res)
-        console.log('tok from foo', res.data.body.access_token)
-        accessToken = localStorage.setItem('accsess_token', res.data.body.access_token);
-        refTocen = localStorage.setItem('refresh_token', res.data.body.refresh_token);
-      })
-      .catch(error => {
-        console.error(error)
-      })
-  })
+  // const refreshInfo = ((token) => {
+  //   axios.post(`http://142.93.134.108:1111/refresh`, { some: 'some' }, {
+  //     headers: {
+  //       Authorization: 'Bearer ' + token,
+  //     }
+  //   })
+  //     .then((res) => {
+  //       console.log('refresh', res)
+  //       console.log('tok from foo', res.data.body.access_token)
+  //       accessToken = localStorage.setItem('accsess_token', res.data.body.access_token);
+  //       refTocen = localStorage.setItem('refresh_token', res.data.body.refresh_token);
+  //     })
+  //     .catch(error => {
+  //       console.error(error)
+  //     })
+  // })
 
     axios.interceptors.request.use(
       config => {
@@ -42,15 +42,29 @@ const Dashboard = (props) => {
         Promise.reject(error)
       });
 
-
   axios.interceptors.response.use(
     async (response) => {
       
       let statusCode = response.data.statusCode;
       if (statusCode === 401) {
-        console.log('yes')
+      console.log('yes')
+      
+      await axios.post(`http://142.93.134.108:1111/refresh`, { some: 'some' }, {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('refresh_token'),
+        }
+      })
+        .then((res) => {
+          console.log('refresh', res)
+          console.log('tok from foo', res.data.body.access_token)
+          accessToken = localStorage.setItem('accsess_token', res.data.body.access_token);
+          refTocen = localStorage.setItem('refresh_token', res.data.body.refresh_token);
+        })
+        .catch(error => {
+          console.error(error)
+        })
+
         
-        refreshInfo(refTocen);
 
       }
       console.log('tok after refresh', accessToken)
@@ -66,7 +80,7 @@ const Dashboard = (props) => {
     const handleInfo = ((token) => {
       axios.get(`http://142.93.134.108:1111/me`, {
         headers: {
-          Authorization: 'Bearer ' + accessToken
+          Authorization: 'Bearer ' + token
         }
       })
         .then((response) => {
@@ -74,7 +88,6 @@ const Dashboard = (props) => {
           let { body } = response.data;
           let text = body.message;
           setContent(text);
-          // console.log('text', text)
         })
         .catch(error => {
           console.error(error)
