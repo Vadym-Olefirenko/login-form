@@ -43,7 +43,7 @@ const Dashboard = (props) => {
       });
 
   axios.interceptors.response.use(
-    async (response) => {
+   async (response) => {
       
       let statusCode = response.data.statusCode;
       if (statusCode === 401) {
@@ -65,11 +65,14 @@ const Dashboard = (props) => {
         })
 
         
-
+        console.log('1tok after refresh', accessToken)
+        console.log('1res', response)
+        return  response;
+      } else {
+        console.log('tok after refresh', accessToken)
+        console.log('res', response)
+        return  response;
       }
-      console.log('tok after refresh', accessToken)
-      console.log('res', response)
-      return  response;
     },
     (error) => {
       return Promise.reject(error);
