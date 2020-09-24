@@ -7,54 +7,62 @@ const Dashboard = (props) => {
   const [content, setContent] = useState('')
 
   let accessToken = localStorage.getItem('accsess_token');
-  let refTocen = localStorage.getItem('refresh_token');
+  let refToken = localStorage.getItem('refresh_token');
 
 
 
-    function getAccessToken(){
-      return localStorage.getItem('accsess_token');
-    }
-   
+  function getAccessToken() {
+    return localStorage.getItem('accsess_token');
+  }
+
   // Use interceptor to inject the token to requests
-  axios.interceptors.request.use(request => {
-      request.headers.get['Authorization'] = `Bearer ${getAccessToken()}`;
-      console.log('1', request);
-      return request;
+  axios.interceptors.request.use((request) => {
+    request.headers.get['Authorization'] = `Bearer ${getAccessToken()}`;
+    console.log('1', request);
+    return request;
   });
 
   axios.interceptors.response.use(
-   async (response) => {
-      
+    async (response) => {
+
       let statusCode = response.data.statusCode;
       if (statusCode === 401) {
-      console.log('yes')
+        console.log('yes')
 
-      
-        await axios.post(`http://142.93.134.108:1111/refresh`, { some: 'some' }, {
-          headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('refresh_token'),
+
+        await fetch('http://142.93.134.108:1111/refresh', {
+          method: 'POST', body: JSON.stringify({
+            some: 'some'
+          }), headers: { 
+            'content-type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('refresh_token'),
           }
         })
-          .then((res) => {
-            console.log('refresh', res)
-            console.log('tok from foo', res.data.body.access_token)
-            accessToken = localStorage.setItem('accsess_token', res.data.body.access_token);
-            refTocen = localStorage.setItem('refresh_token', res.data.body.refresh_token);
+          .then(function (res) {
+            console.log('11', res)
+
+            return res.json();
           })
-          .catch(error => {
-            console.error(error)
+          .then(function (data) {
+            console.log('22', data)
+            accessToken = localStorage.setItem('accsess_token', data.body.access_token);
+            refToken = localStorage.setItem('refresh_token', data.body.refresh_token);
           })
-  
-          
-          console.log('1tok after refresh', accessToken)
-          console.log('1res', response)
-          return response;
-      
-      
+          .catch((error) => {
+            console.log(error)
+          });
+        
+
+
+        console.log('1tok after refresh', accessToken)
+        console.log('1res', response)
+        return response;
+
+
       } else {
         console.log('tok after refresh', accessToken)
         console.log('res', response)
-        return  response;
+        return response;
       }
     },
     (error) => {
