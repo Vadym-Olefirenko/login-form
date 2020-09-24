@@ -49,8 +49,8 @@ function getAccessToken() {
     }
   );
 
-  const handleInfo = ((host) => {
+  const checkValidity = ((host) => {
     return axios.get(host)
   })
 
-  export default handleInfo;
+  export default checkValidity;

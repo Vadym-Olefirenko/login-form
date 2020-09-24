@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import handleInfo from '../../services/services'
+import checkValidity from '../../services/services'
 
 import './Dashboard.css'
 
 const Dashboard = (props) => {
   const [content, setContent] = useState('')
 
-  
-
   useEffect(() => {
     
-    handleInfo('http://142.93.134.108:1111/me')
+    checkValidity('http://142.93.134.108:1111/me')
     .then((response) => {
       console.log('from me', response)
       let { body } = response.data;
