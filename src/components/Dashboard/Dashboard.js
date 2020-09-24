@@ -13,7 +13,7 @@ const Dashboard = (props) => {
 
     function getAccessToken(){
       return localStorage.getItem('accsess_token');
-  }
+    }
    
   // Use interceptor to inject the token to requests
   axios.interceptors.request.use(request => {
@@ -48,7 +48,7 @@ const Dashboard = (props) => {
           
           console.log('1tok after refresh', accessToken)
           console.log('1res', response)
-          return  response;
+          return response;
       
       
       } else {
@@ -63,7 +63,7 @@ const Dashboard = (props) => {
   );
 
   useEffect(() => {
-    const handleInfo = ((token) => {
+    const handleInfo = (() => {
       axios.get(`http://142.93.134.108:1111/me`)
         .then((response) => {
           console.log('from me', response)
@@ -76,7 +76,7 @@ const Dashboard = (props) => {
         })
     })
 
-    handleInfo(accessToken);
+    handleInfo();
 
   }, [accessToken]);
 
