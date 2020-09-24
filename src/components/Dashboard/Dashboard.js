@@ -6,8 +6,8 @@ import './Dashboard.css'
 const Dashboard = (props) => {
   const [content, setContent] = useState('')
 
-  let accessToken = localStorage.getItem('accsess_token');
-  let refToken = localStorage.getItem('refresh_token');
+  // let accessToken = localStorage.getItem('accsess_token');
+  // let refToken = localStorage.getItem('refresh_token');
 
 
 
@@ -23,14 +23,17 @@ const Dashboard = (props) => {
   });
 
   axios.interceptors.response.use(
-    async (response) => {
+    (response) => {
 
       let statusCode = response.data.statusCode;
       if (statusCode === 401) {
         console.log('yes')
 
+        const originalRequest = response.config;
+        console.log('orreq', originalRequest);
 
-        await fetch('http://142.93.134.108:1111/refresh', {
+        originalRequest._retry = true;
+        return fetch('http://142.93.134.108:1111/refresh', {
           method: 'POST', body: JSON.stringify({
             some: 'some'
           }), headers: { 
@@ -45,22 +48,16 @@ const Dashboard = (props) => {
           })
           .then(function (data) {
             console.log('22', data)
-            accessToken = localStorage.setItem('accsess_token', data.body.access_token);
-            refToken = localStorage.setItem('refresh_token', data.body.refresh_token);
+            localStorage.setItem('accsess_token', data.body.access_token);
+            localStorage.setItem('refresh_token', data.body.refresh_token);
+            originalRequest.headers['Authorization'] = `Bearer ${getAccessToken()}`;
+            return axios(originalRequest);
           })
           .catch((error) => {
             console.log(error)
           });
         
-
-
-        console.log('1tok after refresh', accessToken)
-        console.log('1res', response)
-        return response;
-
-
       } else {
-        console.log('tok after refresh', accessToken)
         console.log('res', response)
         return response;
       }
@@ -86,9 +83,7 @@ const Dashboard = (props) => {
 
     handleInfo();
 
-  }, [accessToken]);
-
-
+  }, []);
 
   return (
     <div className="dash__page">
