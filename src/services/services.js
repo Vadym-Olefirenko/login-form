@@ -5,7 +5,9 @@ function getAccessToken() {
   }
 
   axios.interceptors.request.use((request) => {
-    request.headers.get['Authorization'] = `Bearer ${getAccessToken()}`;
+      if(getAccessToken()) {
+        request.headers.get['Authorization'] = `Bearer ${getAccessToken()}`;
+      } 
     return request;
   });
 
