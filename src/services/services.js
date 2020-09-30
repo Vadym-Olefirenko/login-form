@@ -6,8 +6,9 @@ function getAccessToken() {
 
 axios.interceptors.request.use((request) => {
   if (getAccessToken()) {
-    request.headers.get['Authorization'] = `Bearer ${getAccessToken()}`;
+    request.headers['Authorization'] = `Bearer ${getAccessToken()}`;
   }
+  console.log(request.headers['Authorization']);
   return request;
 });
 
@@ -17,9 +18,6 @@ axios.interceptors.response.use(
     let statusCode = response.data.statusCode;
     if (statusCode === 401) {
       const originalRequest = response.config;
-
-      originalRequest._retry = true;
-
       try {
         const res = await fetch('http://142.93.134.108:1111/refresh', {
           method: 'POST', body: JSON.stringify({
@@ -32,10 +30,9 @@ axios.interceptors.response.use(
 
         const data = await res.json();
 
-
+        console.log('new token', data.body.access_token);
         localStorage.setItem('accsess_token', data.body.access_token);
         localStorage.setItem('refresh_token', data.body.refresh_token);
-        originalRequest.headers['Authorization'] = `Bearer ${getAccessToken()}`;
         return axios(originalRequest);
       } catch (error) {
         console.log(error)
