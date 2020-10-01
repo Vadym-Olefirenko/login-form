@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import checkValidity from '../../services/services'
+import instance from '../../services/services';
 
 import './Dashboard.css'
 
@@ -9,7 +9,7 @@ const Dashboard = (props) => {
   useEffect(() => {
     async function fetchingData () {
       try {
-        const response = await checkValidity('http://142.93.134.108:1111/me');
+        const response = await instance.get(`me`);
         console.log('from me', response)
         let { body } = response.data;
         let text = body.message;

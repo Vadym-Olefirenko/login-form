@@ -1,18 +1,25 @@
 import axios from 'axios';
 
+const instance = axios.create({
+  baseURL: "http://142.93.134.108:1111",
+  headers: {
+    'content-type': 'application/json',
+  },
+  responseType: "json"
+})
+
 function getAccessToken() {
   return localStorage.getItem('accsess_token');
 }
 
-axios.interceptors.request.use((request) => {
+instance.interceptors.request.use((request) => {
   if (getAccessToken()) {
     request.headers['Authorization'] = `Bearer ${getAccessToken()}`;
   }
-  console.log(request.headers['Authorization']);
   return request;
 });
 
-axios.interceptors.response.use(
+instance.interceptors.response.use(
   async (response) => {
 
     let statusCode = response.data.statusCode;
@@ -30,10 +37,9 @@ axios.interceptors.response.use(
 
         const data = await res.json();
 
-        console.log('new token', data.body.access_token);
         localStorage.setItem('accsess_token', data.body.access_token);
         localStorage.setItem('refresh_token', data.body.refresh_token);
-        return axios(originalRequest);
+        return instance(originalRequest);
       } catch (error) {
         console.log(error)
       }
@@ -47,6 +53,6 @@ axios.interceptors.response.use(
   }
 );
 
-const checkValidity = host => axios.get(host)
 
-export default checkValidity;
+
+export default instance;
